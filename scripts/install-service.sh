@@ -25,7 +25,7 @@ After=network.target
 [Service]
 Type=simple
 User={user}
-WorkingDirectory={quoted}
+WorkingDirectory={root}
 ExecStart=/usr/bin/python3 -u {script}
 Restart=on-failure
 RestartSec=3
@@ -39,6 +39,7 @@ if p.exists() and p.read_text()!=unit:
     from datetime import datetime
     p.with_name(p.name+'.backup-'+datetime.now().strftime('%Y%m%d-%H%M%S')).write_text(p.read_text())
 p.write_text(unit)
+subprocess.run(['systemd-analyze','verify',str(p)],check=True)
 subprocess.run(['systemctl','daemon-reload'],check=True)
 subprocess.run(['systemctl','enable','capstone-dashboard.service'],check=True)
 subprocess.run(['systemctl','restart','capstone-dashboard.service'],check=True)
